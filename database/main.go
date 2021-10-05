@@ -77,29 +77,25 @@ func main() {
     }
 
     defer db.Close()
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("CREATE DATABASE IF NOT EXISTS art_exhibit")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("USE art_exhibit")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("CREATE TABLE IF NOT EXISTS data(content VARCHAR(50) NOT NULL, time INT NOT NULL)")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
-    // insert, err := db.Query("INSERT INTO data VALUES ( 'TEST', 2 )")
-    // if err != nil {
-    //    panic(err.Error())
-    // }
-    
-    defer insert.Close()
-    Observations = []SemanticObservation {
-    }
     handleRequests()
 }
