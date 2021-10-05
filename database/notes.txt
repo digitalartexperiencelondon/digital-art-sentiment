@@ -1,0 +1,9 @@
+# pull mysql docker image
+docker pull mysql
+docker run --name art-mysql -e MYSQL_ROOT_PASSWORD=admin -d mysql:latest
+# get mysql docker ip address using
+docker inspect art-mysql
+
+docker build -t art-api .
+# run art-api, connecting to mysql db, and exposing internal port 10000 to external port 10000 
+docker run --name art-api -e mysqlip=<art mysql ip>:3304 -e mysqlun=root:admin -p 10000:10000 art-api
