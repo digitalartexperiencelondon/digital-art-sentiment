@@ -12,10 +12,10 @@ RUN pip3 install --upgrade pip && pip3 install \
   librosa \
   matplotlib \
   h5py==2.10.0 \
-  tensorflow==1.15 \
+  #tensorflow==1.15 \
   keras==2.3.1 \
-  torch==1.5.0 \
-  pydub==0.24.1 \
-  torchvision==0.6.0
-
-RUN chmod +x pyaudio.sh && ./pyaudio.sh
+  #torch==1.5.0 \
+  pydub==0.24.1
+  #torchvision==0.6.0
+COPY pyaudio.sh /pyaudio.sh
+RUN chmod +x /pyaudio.sh && ./pyaudio.sh
