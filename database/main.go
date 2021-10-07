@@ -108,7 +108,9 @@ func submitObs(w http.ResponseWriter, r *http.Request){
       Observations = append(Observations, obs)
     }
     // todo elegantly handle sql (injection!)
-    insert, err := db.Query("INSERT INTO data VALUES ( '"+obs.Content+"', "+obs.Time.String()+" )")
+    queryStr := "INSERT INTO data (content, time) VALUES ('"+obs.Content+"', "+strconv.Itoa(int(time.Now().Unix()))+")"
+    fmt.Println(queryStr)
+    insert, err := db.Query(queryStr)
     if err != nil {
        panic(err.Error())
     }
