@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "strconv"
     "log"
     "os"
     "io/ioutil"
@@ -19,11 +20,78 @@ type SemanticObservation struct {
 }
 
 var Observations []SemanticObservation
-var db sql.DB
+var db *sql.DB
+var err error
+
+
+func makeStructJSON(queryText string, w http.ResponseWriter) error {
+
+    // returns rows *sql.Rows
+    rows, err := db.Query(queryText)
+
+    if err != nil {
+	log.Fatal(err)
+        return err
+    }
+    columns, err := rows.Columns()
+    if err != nil {
+        fmt.Printf("Error 2")
+        return err
+    }
+
+    count := len(columns)
+    fmt.Printf(strconv.Itoa(count))
+    values := make([]interface{}, count)
+    scanArgs := make([]interface{}, count)
+    for i := range values {
+        scanArgs[i] = &values[i]
+    }
+
+    masterData := make(map[string][]interface{})
+
+    for rows.Next() {
+        err := rows.Scan(scanArgs...)
+        if err != nil {
+                return err
+        }
+        for i, v := range values {
+            x := v.([]byte)
+            //NOTE: FROM THE GO BLOG: JSON and GO - 25 Jan 2011:
+            // The json package uses map[string]interface{} and []interface{} values to store arbitrary JSON objects and arrays; it will happily unmarshal any valid JSON blob into a plain interface{} value. The default concrete Go types are:
+            //
+            // bool for JSON booleans,
+            // float64 for JSON numbers,
+            // string for JSON strings, and
+            // nil for JSON null.
+            if nx, ok := strconv.ParseFloat(string(x), 64); ok == nil {
+                masterData[columns[i]] = append(masterData[columns[i]], nx)
+            } else if b, ok := strconv.ParseBool(string(x)); ok == nil {
+                masterData[columns[i]] = append(masterData[columns[i]], b)
+            } else if "string" == fmt.Sprintf("%T", string(x)) {
+                masterData[columns[i]] = append(masterData[columns[i]], string(x))
+            } else {
+                fmt.Printf("Failed on if for type %T of %v\n", x, x)
+            }
+
+         }
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+
+    err = json.NewEncoder(w).Encode(masterData)
+
+    if err != nil {
+        return err
+    }
+    return err
+}
+
 
 func returnAllObs(w http.ResponseWriter, r *http.Request){
+    // todo: https://stackoverflow.com/questions/42774467/how-to-convert-sql-rows-to-typed-json-in-golang
+    queryText := "SELECT * FROM data"
+    makeStructJSON(queryText, w)
     fmt.Println("Endpoint Hit: returnAllObs")
-    json.NewEncoder(w).Encode(Observations)
 }
 
 func submitObs(w http.ResponseWriter, r *http.Request){
@@ -39,11 +107,14 @@ func submitObs(w http.ResponseWriter, r *http.Request){
       json.Unmarshal(reqBody, &obs)
       Observations = append(Observations, obs)
     }
-    insert, err := db.Query("INSERT INTO data VALUES ( 'TEST', 2 )")
+    // todo elegantly handle sql (injection!)
+    queryStr := "INSERT INTO data (content, time) VALUES ('"+obs.Content+"', "+strconv.Itoa(int(time.Now().Unix()))+")"
+    fmt.Println(queryStr)
+    insert, err := db.Query(queryStr)
     if err != nil {
        panic(err.Error())
     }
-   defer insert.Close()
+    defer insert.Close()
  
 }
 
@@ -71,35 +142,31 @@ func main() {
     mysqlip := os.Getenv("mysqlip")
     mysqlun := os.Getenv("mysqlun")
     
-    db, err := sql.Open("mysql", mysqlun+"@tcp("+mysqlip+")/")
+    db, err = sql.Open("mysql", mysqlun+"@tcp("+mysqlip+")/")
     if err != nil {
        panic(err.Error())
     }
 
     defer db.Close()
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("CREATE DATABASE IF NOT EXISTS art_exhibit")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("USE art_exhibit")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
     _,err = db.Exec("CREATE TABLE IF NOT EXISTS data(content VARCHAR(50) NOT NULL, time INT NOT NULL)")
-      if err != nil {
-             panic(err)
+    if err != nil {
+         panic(err)
     }
+    fmt.Println("Handling Requests")
 
-    // insert, err := db.Query("INSERT INTO data VALUES ( 'TEST', 2 )")
-    // if err != nil {
-    //    panic(err.Error())
-    // }
-    
-    defer insert.Close()
-    Observations = []SemanticObservation {
-    }
     handleRequests()
 }
