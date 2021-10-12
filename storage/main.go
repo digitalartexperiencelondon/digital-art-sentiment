@@ -12,17 +12,18 @@ import (
     "github.com/gorilla/mux"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
+    "gopkg.in/guregu/null.v4"
 )
 
 type SemanticObservation struct {
-     Anger float32 `json:"Anger"`
-     Contempt float32 `json:"Contempt"`
-     Disgust float32 `json:"Disgust"`
-     Fear float32 `json:"Fear"`
-     Happiness float32 `json:"Happiness"`
-     Neutral float32 `json:"Neutral"`
-     Sadness float32 `json:"Sadness"`
-     Surprise float32 `json:"Surprise"`
+     Anger null.Float `json:"Anger"`
+     Contempt null.Float `json:"Contempt"`
+     Disgust null.Float `json:"Disgust"`
+     Fear null.Float `json:"Fear"`
+     Happiness null.Float `json:"Happiness"`
+     Neutral null.Float `json:"Neutral"`
+     Sadness null.Float `json:"Sadness"`
+     Surprise null.Float `json:"Surprise"`
      Type string `json:"Type"`
      Time time.Time `json:"time"`
 }
@@ -116,14 +117,12 @@ func submitObs(w http.ResponseWriter, r *http.Request){
       Observations = append(Observations, obs)
     }
     // todo elegantly handle sql (injection!)
-    queryStr := "INSERT INTO data (type, anger, contempt, disgust, fear, happiness, neutral, sadness, surprise, time) VALUES ('"+obs.Type+",+obs.Anger+,+obs.Contempt+,+obs.Disgust+,+obs.Fear+,+obs.Happiness+,+obs.Neutral+,+obs.Sadness+,+obs.Surprise+', "+strconv.Itoa(int(time.Now().Unix()))+")"
-    fmt.Println(queryStr)
-    insert, err := db.Query(queryStr)
-    if err != nil {
-       panic(err.Error())
+    queryStr := `INSERT INTO data (type, anger, contempt, disgust, fear, happiness, neutral, sadness, surprise, time) VALUES (?,?,?,?,?,?,?,?,?,?)`
+    _, err2 := db.Exec(queryStr,obs.Type,obs.Anger,obs.Contempt,obs.Disgust,obs.Fear,obs.Happiness,obs.Neutral,obs.Sadness,obs.Surprise,int(time.Now().Unix()) )
+    if err2 != nil {
+       panic(err2.Error())
     }
-    defer insert.Close()
- 
+
 }
 
 func homePage(w http.ResponseWriter, r *http.Request){
