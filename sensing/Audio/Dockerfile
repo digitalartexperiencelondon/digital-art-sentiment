@@ -1,6 +1,6 @@
 # Base Docker image, has to use 3.6 or lower for tensorflow
 #FROM armindocachada/tensorflow2-raspberrypi4:2.3.0-cp35-none-linux_armv7l
-FROM balenalib/raspberry-pi-debian-python:3.6.9
+FROM python:3.7.12-slim-bullseye
 
 RUN pip3 install --upgrade pip && python3 -m pip install --upgrade setuptools
 
