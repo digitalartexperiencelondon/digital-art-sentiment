@@ -12,4 +12,5 @@ docker inspect art-mysql
 docker build -t art-api .
 
 # run art-api, connecting to mysql db, and exposing internal port 10000 to external port 10000 
+## Replace <art mysql ip> with the IP address you found using docker inspect
 docker run --name art-api -e mysqlip=<art mysql ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
