@@ -1,5 +1,6 @@
 # Base Docker image, has to use 3.6 or lower for tensorflow
-FROM armindocachada/tensorflow2-raspberrypi4:2.3.0-cp35-none-linux_armv7l
+#FROM armindocachada/tensorflow2-raspberrypi4:2.3.0-cp35-none-linux_armv7l
+FROM resin/raspberry-pi-alpine-python:3.6.6-edge
 
 RUN pip3 install --upgrade pip && python3 -m pip install --upgrade setuptools
 
@@ -13,7 +14,7 @@ RUN pip3 install \
   librosa \
   matplotlib \
   h5py==2.10.0 \
-  #tensorflow==1.15
+  tensorflow==1.15
   keras==2.3.1 \
   torch==1.5.0+cpu \
   pydub==0.24.1 \
