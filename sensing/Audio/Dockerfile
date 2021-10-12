@@ -14,7 +14,7 @@ RUN pip3 install \
   librosa \
   matplotlib \
   h5py==2.10.0 \
-  tensorflow==1.15
+  tensorflow==1.15 \
   keras==2.3.1 \
   torch==1.5.0+cpu \
   pydub==0.24.1 \
