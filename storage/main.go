@@ -15,7 +15,15 @@ import (
 )
 
 type SemanticObservation struct {
-     Content string `json:"Content"`
+     Anger float32 `json:"Anger"`
+     Contempt float32 `json:"Contempt"`
+     Disgust float32 `json:"Disgust"`
+     Fear float32 `json:"Fear"`
+     Happiness float32 `json:"Happiness"`
+     Neutral float32 `json:"Neutral"`
+     Sadness float32 `json:"Sadness"`
+     Surprise float32 `json:"Surprise"`
+     Type string `json:"Type"`
      Time time.Time `json:"time"`
 }
 
@@ -108,7 +116,7 @@ func submitObs(w http.ResponseWriter, r *http.Request){
       Observations = append(Observations, obs)
     }
     // todo elegantly handle sql (injection!)
-    queryStr := "INSERT INTO data (content, time) VALUES ('"+obs.Content+"', "+strconv.Itoa(int(time.Now().Unix()))+")"
+    queryStr := "INSERT INTO data (type, anger, contempt, disgust, fear, happiness, neutral, sadness, surprise, time) VALUES ('"+obs.Type+",+obs.Anger+,+obs.Contempt+,+obs.Disgust+,+obs.Fear+,+obs.Happiness+,+obs.Neutral+,+obs.Sadness+,+obs.Surprise+', "+strconv.Itoa(int(time.Now().Unix()))+")"
     fmt.Println(queryStr)
     insert, err := db.Query(queryStr)
     if err != nil {
@@ -162,7 +170,7 @@ func main() {
     }
     fmt.Println("Handling Requests")
 
-    _,err = db.Exec("CREATE TABLE IF NOT EXISTS data(content VARCHAR(50) NOT NULL, time INT NOT NULL)")
+    _,err = db.Exec("CREATE TABLE IF NOT EXISTS data(type VARCHAR(50) NOT NULL, time INT NOT NULL, anger FLOAT, contempt FLOAT, disgust FLOAT, fear FLOAT, happiness FLOAT, neutral FLOAT, sadness FLOAT, surprise FLOAT )")
     if err != nil {
          panic(err)
     }
