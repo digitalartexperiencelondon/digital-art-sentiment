@@ -4,9 +4,9 @@ FROM python:3.7.12-slim-bullseye
 
 RUN pip3 install --upgrade pip && python3 -m pip install --upgrade setuptools
 
-#RUN apt update
-#RUN apt -y install libasound2-dev portaudio19-dev libportaudio2 libportaudiocpp0 ffmpeg python3-venv
-#RUN apt-get -y install python3-pyaudio
+RUN apt update
+RUN apt -y install libasound2-dev portaudio19-dev libportaudio2 libportaudiocpp0 ffmpeg python3-venv
+RUN apt-get -y install python3-pyaudio
 
 RUN pip3 uninstall -y keras-nightly
 RUN pip3 install --upgrade pip
