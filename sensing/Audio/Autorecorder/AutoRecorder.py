@@ -53,15 +53,30 @@ class Recorder:
         while current <= end:
 
             data = self.stream.read(chunk)
+            """
+            # commenting out infinite length recording
             if self.rms(data) >= Threshold:
                 end = time.time() + TIMEOUT_LENGTH
-
+            """
             current = time.time()
             rec.append(data)
         self.write(b''.join(rec))
 
     def write(self, recording):
+
+        print('deleting old files')
+
+        now = time.time()
+
+        for f in os.listdir(f_name_directory):
+            g = os.path.join(f_name_directory, f)
+            if os.stat(g).st_mtime < now - 3600:
+                if os.path.isfile(g):
+                    os.remove(g)
+
         n_files = len(os.listdir(f_name_directory))
+
+        print('Writing new file')
 
         filename = os.path.join(f_name_directory, '{}.wav'.format(n_files))
 
