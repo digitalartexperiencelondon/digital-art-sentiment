@@ -110,6 +110,17 @@ func returnAllObs(w http.ResponseWriter, r *http.Request){
     fmt.Println("Endpoint Hit: returnAllObs")
 }
 
+func returnAverageObs(w http.ResponseWriter, r *http.Request){
+    t, err:=strconv.Atoi(r.URL.Query().Get("t"))
+    if err != nil {
+        t = 0
+    }
+    queryText := "SELECT * FROM data WHERE Time > " + strconv.Itoa(int(time.Now().UnixMilli())-t)
+    makeStructJSON(queryText, w)
+    fmt.Println("Endpoint Hit: returnAverageObs")
+}
+
+
 func submitObs(w http.ResponseWriter, r *http.Request){
     fmt.Println("Endpoint Hit: submitObs")
     var obs SemanticObservation
@@ -125,7 +136,7 @@ func submitObs(w http.ResponseWriter, r *http.Request){
     }
     // todo elegantly handle sql (injection!)
     queryStr := `INSERT INTO data (type, anger, contempt, disgust, fear, happiness, neutral, sadness, surprise, time) VALUES (?,?,?,?,?,?,?,?,?,?)`
-    _, err2 := db.Exec(queryStr,obs.Type,obs.Anger,obs.Contempt,obs.Disgust,obs.Fear,obs.Happiness,obs.Neutral,obs.Sadness,obs.Surprise,int(time.Now().Unix()) )
+    _, err2 := db.Exec(queryStr,obs.Type,obs.Anger,obs.Contempt,obs.Disgust,obs.Fear,obs.Happiness,obs.Neutral,obs.Sadness,obs.Surprise,int(time.Now().UnixMilli()) )
     if err2 != nil {
        panic(err2.Error())
     }
@@ -141,6 +152,7 @@ func handleRequests() {
     Router :=  mux.NewRouter().StrictSlash(true)
     Router.HandleFunc("/", homePage)
     Router.HandleFunc("/observations", returnAllObs)
+    Router.HandleFunc("/aggregated", returnAverageObs)
     Router.HandleFunc("/submit", submitObs)
     log.Fatal(http.ListenAndServe("0.0.0.0:10000", Router))
 }
