@@ -56,13 +56,14 @@ func makeStructJSON(queryText string, w http.ResponseWriter) error {
         scanArgs[i] = &values[i]
     }
 
-    masterData := make(map[string][]interface{})
+    masterData := make([]interface{},0)
 
     for rows.Next() {
         err := rows.Scan(scanArgs...)
         if err != nil {
                 return err
         }
+        tempData := make(map[string]interface{})
         for i, v := range values {
             if v != nil {
                 x := v.([]byte)
@@ -75,19 +76,20 @@ func makeStructJSON(queryText string, w http.ResponseWriter) error {
                 // string for JSON strings, and
                 // nil for JSON null.
                 if nx, ok := strconv.ParseFloat(string(x), 64); ok == nil {
-                    masterData[columns[i]] = append(masterData[columns[i]], nx)
+                    tempData[columns[i]] = nx
                 } else if b, ok := strconv.ParseBool(string(x)); ok == nil {
-                    masterData[columns[i]] = append(masterData[columns[i]], b)
+                    tempData[columns[i]] = b
                 } else if "string" == fmt.Sprintf("%T", string(x)) {
-                    masterData[columns[i]] = append(masterData[columns[i]], string(x))
+                    tempData[columns[i]] = string(x)
                 } else {
                     fmt.Printf("Failed on if for type %T of %v\n", x, x)
                 }
             } else {
-                masterData[columns[i]] = append(masterData[columns[i]],nil)
+                tempData[columns[i]] = nil
             }
 
-         }
+        }
+        masterData = append(masterData, tempData)
     }
 
     w.Header().Set("Content-Type", "application/json")
