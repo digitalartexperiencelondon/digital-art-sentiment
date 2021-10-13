@@ -22,7 +22,7 @@ RUN apt-get -y install python3-pyaudio
 
 RUN pip3 install \
   keras==2.3.1 \
-  torch==1.5.0+cpu \
+  torch==1.5.0 \
   pydub==0.24.1 \
   torchvision==0.6.0
 
