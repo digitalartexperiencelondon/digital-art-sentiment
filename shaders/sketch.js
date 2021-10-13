@@ -1,7 +1,11 @@
-let simpleShader;
+let dataJson;
+let sentimentResponse;
+let loadedShader;
 
 function preload() {
-  simpleShader = loadShader(
+  dataJson = loadJSON("assets/test_data.json");
+
+  loadedShader = loadShader(
     "assets/vertex_shader.glsl",
     "assets/fragment_shader.glsl"
   );
@@ -9,10 +13,16 @@ function preload() {
 
 function setup() {
   createCanvas(400, 400, WEBGL);
+  sentimentResponse = new SentimentResponse(dataJson);
 }
 
 function draw() {
-  shader(simpleShader);
+  shader(loadedShader);
+
+  loadedShader.setUniform("u_resolution", [width, height]);
+  loadedShader.setUniform("u_time", frameCount);
+  loadedShader.setUniform("u_audio", Object.values(sentimentResponse.audio));
+
   rect(0, 0, width, height);
 }
 

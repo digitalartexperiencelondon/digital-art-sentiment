@@ -1,0 +1,24 @@
+{
+    "time": 3564704567,
+    "duration": 0.5,
+    "audio": {
+        "anger": 0.1,
+        "contempt": 0.2,
+        "disgust": 0.3,
+        "fear": 0.4,
+        "happiness": 0.5,
+        "neutral": 0.6,
+        "sadness": 0.7,
+        "surprise": 0.8
+    },
+    "video": {
+        "anger": null,
+        "contempt": null,
+        "disgust": null,
+        "fear": null,
+        "happiness": 0.92,
+        "neutral": 0.3,
+        "sadness": 0.1,
+        "surprise": null
+    }
+}
