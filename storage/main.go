@@ -115,7 +115,7 @@ func returnAverageObs(w http.ResponseWriter, r *http.Request){
     if err != nil {
         t = 0
     }
-    queryText := "SELECT type, AVG(anger), AVG(contempt), AVG(disgust), AVG(fear), AVG(happiness), AVG(neutral), AVG(sadness), AVG(surprise) FROM data WHERE Time > " + strconv.Itoa(int(time.Now().UnixMilli())-t) + " GROUP BY type"
+    queryText := "SELECT type, AVG(anger) AS anger, AVG(contempt) AS contempt, AVG(disgust) AS disgust , AVG(fear) AS fear, AVG(happiness) AS happiness, AVG(neutral) AS neutral, AVG(sadness) AS sadness, AVG(surprise) AS surprise FROM data WHERE Time > " + strconv.Itoa(int(time.Now().UnixMilli())-t) + " GROUP BY type"
     makeStructJSON(queryText, w)
     fmt.Println("Endpoint Hit: returnAverageObs")
 }
