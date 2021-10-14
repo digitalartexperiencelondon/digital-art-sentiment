@@ -1,22 +1,27 @@
-# Running a ML model on a Raspberry Pi to turn audio inputs into sentiments
+# Running the Mevon-AI Machine Learning model in a Docker container on a desktop
 
 ## Building the Docker container
-Navigate to the directory containing the Dockerfile on the Raspberry Pi.
+Once you have git cloned this repository (by running `git clone https://github.com/digitalartexperiencelondon/digital-art-sentiment.git`), navigate to the directory containing the Dockerfile by running:
+`cd digital-art-sentiment/sensing/Audio`.
 
-Run
-`sudo docker build -t audio-input .`
-This builds a Docker image called `audio-input`. This stage might take a while the first time it is run, due to the size of the layers.
+Open Docker desktop (on your desktop, you should be able to search for Docker in your applications and open it). This will open an application. Go to Settings/Resources, and increase the memory allocation to 3.50GB and the Swap to 2GB.
 
-### Interactively experiment with the Docker container and required packages
-Alternatively, to test whether the base image works you can run
-`sudo docker pull armindocachada/tensorflow2-raspberrypi4:2.3.0-cp35-none-linux_armv7l`.
-And then you should be able to run
-`sudo docker run -it armindocachada/tensorflow2-raspberrypi4:2.3.0-cp35-none-linux_armv7l /bin/sh`
-Once in the container, you can run all the commands listed in the Dockerfile (with `RUN` removed) and progressively change them as required.
+To build the Docker container, run
+`docker build -t audio-input .`
+This builds a Docker image called `audio-input` (you can change this name to anything of your choosing). This stage might take a while the first time it is run, due to the size of the layers. It will download a large amount from the internet, so it may be worth using Ethernet or closing other applications which are downloading.
 
 ## Running the Docker container
+Whilst in the `digital-art-sentiment/sensing/Audio` folder on your desktop, create a new folder called `input`.
 Run
-`sudo docker run -it audio-input /bin/sh`.
-This should get you into the Docker container.
+`docker run -it -v "$(pwd)"/input:/digital-art-sentiment/MevonAI-Speech-Emotion-Recognition/src/input/test:ro art-ml2 /bin/sh`
+This should get you into the Docker container. This maps the `input` folder on your Desktop to the Docker container, so that the Docker container has read only access to any files which are put in there.
 
-If it fails, tell Sonal which line it failed on.
+This means that the audio recordings can be placed in this folder, and when the Docker container is run, the Mevon-AI pre-trained model can analyse the sentiment of these recordings.
+
+## Running the ML model
+Once in the Docker container, to run the Mevon-AI machine learning model, run:
+`cd digital-art-sentiment/MevonAI-Speech-Emotion-Recognition/src`
+and
+`python3 speechEmotionRecognition.py`.
+
+This will run the pre-trained machine learning model using the files in src/input.
