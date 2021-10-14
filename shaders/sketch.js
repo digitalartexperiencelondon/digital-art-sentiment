@@ -1,11 +1,13 @@
 const fps = 60;
-const fetchDataFrequencySeconds = 2;
+const fetchDataFrequencySeconds = 0.5;
 
+let loadedShader;
 let dataJson;
 let sentimentResponse;
-let loadedShader;
 
-let audioSentiment;
+let previousRecord = [];
+let currentRecord;
+let recordToShader;
 
 function preload() {
   dataJson = loadJSON("assets/test_data.json");
@@ -18,26 +20,41 @@ function preload() {
 
 function setup() {
   frameRate(fps);
-  createCanvas(400, 400, WEBGL);
+  createCanvas(windowHeight, windowHeight, WEBGL);
   sentimentResponse = new SentimentResponse(dataJson);
-  audioSentiment = Object.values(sentimentResponse.audio);
+  currentRecord = Object.values(sentimentResponse.audio);
+  recordToShader = currentRecord;
 }
 
 function draw() {
   shader(loadedShader);
 
   // Simulate fetch data for testing
-  if (frameCount % fps == fetchDataFrequencySeconds) {
-    audioSentiment = Array.from(Array(8)).map((x) => random(0.0, 1.0));
+  if (frameCount % (fps * fetchDataFrequencySeconds) == 1) {
+    previousRecord = currentRecord;
+    currentRecord = Array.from(Array(8)).map((x) => random(0.0, 1.0));
+  }
+  // Iterpolate values between updates
+  else if (previousRecord.lenght != 0) {
+    recordToShader = currentRecord.map((amount, idx) => {
+      return map(
+        frameCount % (fps * fetchDataFrequencySeconds),
+        1,
+        fps * fetchDataFrequencySeconds,
+        previousRecord[idx],
+        amount
+      );
+    });
+    previousRecord = recordToShader.map((x) => x);
   }
 
-  loadedShader.setUniform("u_resolution", [width, height]);
   loadedShader.setUniform("u_time", frameCount);
-  loadedShader.setUniform("u_audio", audioSentiment);
+  loadedShader.setUniform("u_audio", recordToShader);
 
   rect(0, 0, width, height);
 }
 
-// function windowResized() {
-//   resizeCanvas(windowWidth, windowHeight);
-// }
+function windowResized() {
+  // resizeCanvas(windowWidth, windowHeight);
+  resizeCanvas(windowHeight, windowHeight);
+}

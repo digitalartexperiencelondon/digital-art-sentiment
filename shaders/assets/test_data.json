@@ -2,14 +2,14 @@
     "time": 3564704567,
     "duration": 0.5,
     "audio": {
-        "anger": 0.1,
-        "contempt": 0.2,
-        "disgust": 0.3,
-        "fear": 0.4,
-        "happiness": 0.5,
-        "neutral": 0.6,
-        "sadness": 0.7,
-        "surprise": 0.8
+        "anger": 0.125,
+        "contempt": 0.125,
+        "disgust": 0.125,
+        "fear": 0.125,
+        "happiness": 0.125,
+        "neutral": 0.125,
+        "sadness": 0.125,
+        "surprise": 0.125
     },
     "video": {
         "anger": null,

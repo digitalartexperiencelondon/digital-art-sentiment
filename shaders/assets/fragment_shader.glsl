@@ -1,4 +1,5 @@
-#define BLUR 0.01
+#define PI 3.141592653589793238462643
+#define TWO_PI 2.0 * PI
 #define erase(scene, mask) scene *(1. - mask)
 #define add(scene, object, color) erase(scene, object) + object *color
 #define parse256RGB(r, g, b)                                                   \
@@ -11,13 +12,13 @@
 #define COLOR_NEUTRAL parse256RGB(255, 255, 255)  // GREYSCALE/WHITE
 #define COLOR_SADNESS parse256RGB(82, 80, 255)    // DARK BLUE
 #define COLOR_SURPRISE parse256RGB(0, 192, 255)   // LIGHT BLUE
+#define BGCOLOR parse256RGB(20, 20, 20)
 #define NUM_SENTIMENTS 8
-
+#define FADE_AMOUNT 0.5
 precision mediump float;
 
 varying vec4 vPosition;
 
-uniform vec2 u_resolution;
 uniform float u_time;
 uniform float u_audio[NUM_SENTIMENTS];
 
@@ -26,27 +27,47 @@ struct Sentiment {
   vec3 color;
 };
 
+struct FadeOutCircle {
+  float radius;
+  vec2 position;
+  vec3 color;
+};
+
 Sentiment getSentiment(float data[NUM_SENTIMENTS], int idx);
 
-float sdCircle(vec2 p, vec2 center, float radius) {
-  return smoothstep(radius + BLUR, radius, length(p - center));
+vec4 FadeOutCircleSDF(FadeOutCircle circle, vec2 p) {
+  float d = circle.radius / length(p - circle.position);
+  return vec4(circle.color * d, d);
 }
 
 void main() {
-
+  // float t = 0.01 * u_time;
   vec2 p = vPosition.xy;
-  float time = 0.01 * u_time;
+  p = 2.0 * p - 1.0;
 
-  vec3 scene = vec3(0.1);
+  float totalAlpha = 0.0;
+  vec3 totalColor = vec3(0.0);
   for (int idx = 0; idx < NUM_SENTIMENTS; idx++) {
     Sentiment sentiment = getSentiment(u_audio, idx);
 
-    vec2 center = vec2((float(idx) + 0.5) / float(NUM_SENTIMENTS), 0.5);
+    FadeOutCircle circle;
+    float r = 0.5;
+    float alpha = TWO_PI * float(idx) / float(NUM_SENTIMENTS);
+    float x = r * cos(alpha);
+    float y = r * sin(alpha);
+    circle.position = vec2(x, y);
+    circle.radius = sentiment.amount;
+    circle.color = sentiment.color;
 
-    float radius = 0.05 * smoothstep(-1.0, 1.0, sin(sentiment.amount));
-    float circle = sdCircle(p, center, radius);
-    scene = add(scene, circle, sentiment.color);
+    vec4 circleSD = FadeOutCircleSDF(circle, p);
+    totalAlpha += circleSD.a;
+    totalColor += circleSD.rgb;
   }
+
+  float totalShape = smoothstep(float(NUM_SENTIMENTS) - FADE_AMOUNT,
+                                float(NUM_SENTIMENTS), totalAlpha);
+  vec3 scene = BGCOLOR;
+  scene = add(scene, totalShape, totalColor / totalAlpha);
 
   gl_FragColor = vec4(scene, 1.0);
 }
