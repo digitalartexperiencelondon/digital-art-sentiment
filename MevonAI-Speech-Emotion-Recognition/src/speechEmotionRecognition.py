@@ -28,27 +28,25 @@ classes = ['Neutral', 'Happy', 'Sad',
 def predict(folder, classes, model):
     solutions = []
     filenames = []
-    for subdir in os.listdir(folder):
-        # print(subdir)
+    lst = []
+    predictions = []
+    # print("Sub",subdir)
 
-        lst = []
-        predictions = []
-        # print("Sub",subdir)
-        filenames.append(subdir)
-        for file in os.listdir(f'{folder}'):
-            # print(subdir,"+",file)
-            temp = np.zeros((1, 13, 216))
-            X, sample_rate = librosa.load(os.path.join(
-                f'{folder}{"/"}', file), res_type='kaiser_fast', duration=2.5, sr=22050*2, offset=0.5)
-            mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13)
-            result = np.zeros((13, 216))
-            result[:mfccs.shape[0], :mfccs.shape[1]] = mfccs
-            temp[0] = result
-            t = np.expand_dims(temp, axis=3)
-            ans = model.predict_classes(t)
-            print("SOL", classes[ans[0]])
-            print("ans predict is", model.predict(t))
-            predictions.append(classes[ans[0]])
+    for file in os.listdir(f'{folder}'):
+        filenames.append(file)
+        # print(subdir,"+",file)
+        temp = np.zeros((1, 13, 216))
+        X, sample_rate = librosa.load(os.path.join(
+            f'{folder}{"/"}', file), res_type='kaiser_fast', duration=2.5, sr=22050*2, offset=0.5)
+        mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13)
+        result = np.zeros((13, 216))
+        result[:mfccs.shape[0], :mfccs.shape[1]] = mfccs
+        temp[0] = result
+        t = np.expand_dims(temp, axis=3)
+        ans = model.predict_classes(t)
+        print("SOL", classes[ans[0]])
+        print("ans predict is", model.predict(t))
+        predictions.append(classes[ans[0]])
 
         if len(predictions) < 2:
             predictions.append('None')
