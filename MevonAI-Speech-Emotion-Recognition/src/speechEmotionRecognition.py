@@ -63,9 +63,8 @@ if __name__ == '__main__':
     #print("Diarized", subdir)
 
     folder = OUTPUT_FOLDER_PATH
-    for subFile in os.listdir(folder):
-        predictions, filenames = predict(
-            f'{folder}', classes, model)
-        # print("filename:",filenames,",Predictions:",predictions)
+    predictions, filenames = predict(
+        f'{folder}', classes, model)
+    # print("filename:",filenames,",Predictions:",predictions)
 
     # os.remove("filterTemp.wav")
