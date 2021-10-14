@@ -1,2 +1,4 @@
 sensing/Audio/Autorecorder/records
 .DS_Store
+MevonAI-Speech-Emotion-Recognition/src/input/*
+MevonAI-Speech-Emotion-Recognition/src/SER*
