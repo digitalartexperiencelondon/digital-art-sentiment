@@ -12,13 +12,14 @@
 #define COLOR_NEUTRAL parse256RGB(255, 255, 255)  // GREYSCALE/WHITE
 #define COLOR_SADNESS parse256RGB(82, 80, 255)    // DARK BLUE
 #define COLOR_SURPRISE parse256RGB(0, 192, 255)   // LIGHT BLUE
-#define BGCOLOR parse256RGB(20, 20, 20)
+#define BGCOLOR parse256RGB(250, 250, 250)
 #define NUM_SENTIMENTS 8
-#define FADE_AMOUNT 0.5
+#define FADE_AMOUNT 1.5
 precision mediump float;
 
 varying vec4 vPosition;
 
+uniform vec2 u_resolution;
 uniform float u_time;
 uniform float u_audio[NUM_SENTIMENTS];
 
@@ -41,9 +42,9 @@ vec4 FadeOutCircleSDF(FadeOutCircle circle, vec2 p) {
 }
 
 void main() {
-  // float t = 0.01 * u_time;
-  vec2 p = vPosition.xy;
-  p = 2.0 * p - 1.0;
+  float t = 0.01 * u_time;
+  vec2 p = 2.0 * vPosition.xy - 1.0;
+  p.x *= u_resolution.x / u_resolution.y;
 
   float totalAlpha = 0.0;
   vec3 totalColor = vec3(0.0);
@@ -53,8 +54,8 @@ void main() {
     FadeOutCircle circle;
     float r = 0.5;
     float alpha = TWO_PI * float(idx) / float(NUM_SENTIMENTS);
-    float x = r * cos(alpha);
-    float y = r * sin(alpha);
+    float x = r * cos(alpha * t);
+    float y = r * sin(alpha + t);
     circle.position = vec2(x, y);
     circle.radius = sentiment.amount;
     circle.color = sentiment.color;

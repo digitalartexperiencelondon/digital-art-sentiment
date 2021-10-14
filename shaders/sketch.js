@@ -1,60 +1,69 @@
 const fps = 60;
-const fetchDataFrequencySeconds = 0.5;
+const fetchFrequencySeconds = 1;
 
 let loadedShader;
-let dataJson;
-let sentimentResponse;
 
-let previousRecord = [];
-let currentRecord;
-let recordToShader;
+let sentimentResponse;
+let shaderSentiments;
+
+// let dataJson;
+
+function fetchSentimentData() {
+  console.log("Fetching data...");
+
+  // let url = "TBD";
+  // httpGet(url, "jsonp", false, function (response) {
+  //   sentimentResponse =  new SentimentResponse(response);
+  // });
+
+  // Local testing:
+  const response = Array.from(Array(8)).map((x) => random(0.0, 1.0));
+  shaderSentiments = sentimentResponse ?? response;
+  sentimentResponse = response;
+}
 
 function preload() {
-  dataJson = loadJSON("assets/test_data.json");
-
   loadedShader = loadShader(
     "assets/vertex_shader.glsl",
     "assets/fragment_shader.glsl"
   );
+
+  // dataJson = loadJSON("assets/test_data.json");
 }
 
 function setup() {
   frameRate(fps);
-  createCanvas(windowHeight, windowHeight, WEBGL);
-  sentimentResponse = new SentimentResponse(dataJson);
-  currentRecord = Object.values(sentimentResponse.audio);
-  recordToShader = currentRecord;
+  createCanvas(windowWidth, windowHeight, WEBGL);
 }
 
 function draw() {
+  const fetchFrequencyFrames = fps * fetchFrequencySeconds;
+  const interpolationFrame = frameCount % fetchFrequencyFrames;
+
+  // Fetch data every first frame of the interpolation
+  if (interpolationFrame == 1) {
+    fetchSentimentData();
+  }
+
+  // Do nothing until the data is fetched
+  if (!sentimentResponse) {
+    return;
+  }
+
+  // Interpolate the sentiment values from the last value sent to the shaders,
+  // to the last fetched value.
+  shaderSentiments = sentimentResponse.map((amount, idx) => {
+    const lastAmount = shaderSentiments[idx];
+    return map(interpolationFrame, 1, fetchFrequencyFrames, lastAmount, amount);
+  });
+
   shader(loadedShader);
-
-  // Simulate fetch data for testing
-  if (frameCount % (fps * fetchDataFrequencySeconds) == 1) {
-    previousRecord = currentRecord;
-    currentRecord = Array.from(Array(8)).map((x) => random(0.0, 1.0));
-  }
-  // Iterpolate values between updates
-  else if (previousRecord.lenght != 0) {
-    recordToShader = currentRecord.map((amount, idx) => {
-      return map(
-        frameCount % (fps * fetchDataFrequencySeconds),
-        1,
-        fps * fetchDataFrequencySeconds,
-        previousRecord[idx],
-        amount
-      );
-    });
-    previousRecord = recordToShader.map((x) => x);
-  }
-
+  loadedShader.setUniform("u_resolution", [width, height]);
   loadedShader.setUniform("u_time", frameCount);
-  loadedShader.setUniform("u_audio", recordToShader);
-
+  loadedShader.setUniform("u_audio", shaderSentiments);
   rect(0, 0, width, height);
 }
 
 function windowResized() {
-  // resizeCanvas(windowWidth, windowHeight);
-  resizeCanvas(windowHeight, windowHeight);
+  resizeCanvas(windowWidth, windowHeight);
 }
