@@ -1,8 +1,11 @@
 import requests
 import random
 import time
+import os
 
-url= 'http://192.168.1.8:10000/submit'
+ip = os.getenv('SENTIMENT_SERVER_IP')
+
+url= 'http://'+ip+':10000/submit'
 
 while True:
 	headers ={"Content-Type":"application/json"}
