@@ -13,7 +13,7 @@ This builds a Docker image called `audio-ml` (you can change this name to anythi
 ## Running the Docker container
 Whilst in the `digital-art-sentiment/sensing/Audio` folder on your desktop, create a new folder called `Autorecorder`, and in there create a folder called `records`.
 Run
-`docker run -it -v "$(pwd)"/Autorecorder/records:/input:ro audio-ml /bin/sh`
+`docker run -it -v "$(pwd)"/Autorecorder/records:/records:ro audio-ml /bin/sh`
 This should get you into the Docker container. This maps the `input` folder on your desktop to the Docker container, so that the Docker container has read only access to any files which are put in there.
 
 This means that the audio recordings can be placed in this folder, and when the Docker container is run, the Mevon-AI pre-trained model can analyse the sentiment of these recordings.
