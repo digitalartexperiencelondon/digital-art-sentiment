@@ -22,7 +22,7 @@ docker inspect art-mysql
 
 Build and run the art-api docker container, connecting to mysql db, and exposing internal port 10000 to external >docker 
 ```
-build -t art-api .
+docker build -t art-api .
 docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
 ```
 
@@ -38,6 +38,7 @@ The server exposes multiple endpoints for different purposes
 
 ### GET endpoints
 ```/observations``` GET all sentiment events in the database
+
 ```/aggregated?t=<time>``` GET sentiment events grouped by type from the last ```<time>``` milliseconds
 
 ### POST endpoint
