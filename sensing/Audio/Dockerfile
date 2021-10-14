@@ -1,5 +1,5 @@
 # This is to be run on a laptop as the base image requires AMD
-FROM tensorflow/tensorflow:1.15.0-py3
+FROM tensorflow/tensorflow:1.15.0-py3 AS install
 
 RUN apt-get update && apt -y install git
 
@@ -22,6 +22,8 @@ RUN pip3 install \
   torch==1.5.0 \
   pydub==0.24.1 \
   torchvision==0.6.0
+
+FROM install AS setup
 
 COPY entrypoint.sh /entrypoint.sh
 
