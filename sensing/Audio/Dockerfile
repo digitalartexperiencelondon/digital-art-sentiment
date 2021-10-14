@@ -23,6 +23,6 @@ RUN pip3 install \
   pydub==0.24.1 \
   torchvision==0.6.0
 
-RUN git clone https://github.com/digitalartexperiencelondon/digital-art-sentiment.git
+COPY entrypoint.sh /entrypoint.sh
 
-RUN cd digital-art-sentiment && git checkout Mevon-AI && cd MevonAI-Speech-Emotion-Recognition/src && chmod +x pyaudio.sh && ./pyaudio.sh
+ENTRYPOINT ["/entrypoint.sh"]
