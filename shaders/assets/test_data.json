@@ -1,24 +1,11 @@
 {
-    "time": 3564704567,
-    "duration": 0.5,
-    "audio": {
-        "anger": 0.125,
-        "contempt": 0.125,
-        "disgust": 0.125,
-        "fear": 0.125,
-        "happiness": 0.125,
-        "neutral": 0.125,
-        "sadness": 0.125,
-        "surprise": 0.125
-    },
-    "video": {
-        "anger": null,
-        "contempt": null,
-        "disgust": null,
-        "fear": null,
-        "happiness": 0.92,
-        "neutral": 0.3,
-        "sadness": 0.1,
-        "surprise": null
-    }
+    "anger": 0.52,
+    "contempt": 0.3,
+    "disgust": 0.9,
+    "fear": 0.125,
+    "happiness": 0.125,
+    "neutral": 0.125,
+    "sadness": 0.6,
+    "surprise": 0.99,
+    "type": "audio"
 }
