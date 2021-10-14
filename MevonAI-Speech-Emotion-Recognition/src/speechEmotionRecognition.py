@@ -64,7 +64,7 @@ if __name__ == '__main__':
            # f'{INPUT_FOLDER_PATH}{subdir}{"/"}', (f'{OUTPUT_FOLDER_PATH}{subdir}{"/"}'))
         #print("Diarized", subdir)
 
-    folder = OUTPUT_FOLDER_PATH
+    folder = INPUT_FOLDER_PATH
     for subdir in os.listdir(folder):
         predictions, filenames = predict(
             f'{folder}{"/"}{subdir}', classes, model)
