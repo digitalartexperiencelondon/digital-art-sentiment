@@ -8,6 +8,7 @@ cd MevonAI-Speech-Emotion-Recognition/src
 chmod +x pyaudio.sh
 ./pyaudio.sh
 
+#This needs to be done in the entrypoint script provided you have moun
+cp -a /input/. /digital-art-sentiment/MevonAI-Speech-Emotion-Recognition/src/
 
-
-/bin/sh
+/bin/bash
