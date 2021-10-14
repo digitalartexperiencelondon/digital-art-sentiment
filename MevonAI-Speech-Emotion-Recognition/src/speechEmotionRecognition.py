@@ -35,11 +35,11 @@ def predict(folder, classes, model):
         predictions = []
         # print("Sub",subdir)
         filenames.append(subdir)
-        for file in os.listdir(f'{folder}{"/"}{subdir}'):
+        for file in os.listdir(f'{folder}'):
             # print(subdir,"+",file)
             temp = np.zeros((1, 13, 216))
             X, sample_rate = librosa.load(os.path.join(
-                f'{folder}{"/"}{subdir}{"/"}', file), res_type='kaiser_fast', duration=2.5, sr=22050*2, offset=0.5)
+                f'{folder}{"/"}', file), res_type='kaiser_fast', duration=2.5, sr=22050*2, offset=0.5)
             mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13)
             result = np.zeros((13, 216))
             result[:mfccs.shape[0], :mfccs.shape[1]] = mfccs
@@ -59,17 +59,17 @@ def predict(folder, classes, model):
 if __name__ == '__main__':
     INPUT_FOLDER_PATH = "input/"
     OUTPUT_FOLDER_PATH = "output/"
-    #for subdir in os.listdir(INPUT_FOLDER_PATH):
-        #bk.diarizeFromFolder(
-           # f'{INPUT_FOLDER_PATH}{subdir}{"/"}', (f'{OUTPUT_FOLDER_PATH}{subdir}{"/"}'))
-        #print("Diarized", subdir)
+    # for subdir in os.listdir(INPUT_FOLDER_PATH):
+    # bk.diarizeFromFolder(
+    # f'{INPUT_FOLDER_PATH}{subdir}{"/"}', (f'{OUTPUT_FOLDER_PATH}{subdir}{"/"}'))
+    #print("Diarized", subdir)
 
-    folder = INPUT_FOLDER_PATH
-    for subdir in os.listdir(folder):
+    folder = OUTPUT_FOLDER_PATH
+    for subFile in os.listdir(folder):
         predictions, filenames = predict(
-            f'{folder}{"/"}{subdir}', classes, model)
+            f'{folder}', classes, model)
         # print("filename:",filenames,",Predictions:",predictions)
-        with open('SER_'+subdir+'.csv', 'w') as csvFile:
+        with open('SER_'+subFile+'.csv', 'w') as csvFile:
             writer = csv.writer(csvFile)
             for i in range(len(filenames)):
                 csvData = [filenames[i], 'person01', predictions[i]
@@ -78,4 +78,4 @@ if __name__ == '__main__':
                       predictions[i][0], ",Person2:", predictions[i][1])
                 writer.writerow(csvData)
         csvFile.close()
-    os.remove("filterTemp.wav")
+    # os.remove("filterTemp.wav")
