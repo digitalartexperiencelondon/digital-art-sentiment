@@ -9,6 +9,6 @@ chmod +x pyaudio.sh
 ./pyaudio.sh
 
 #This needs to be done in the entrypoint script provided you have moun
-cp -a /input/. /digital-art-sentiment/MevonAI-Speech-Emotion-Recognition/src/
+cp -a /records/. /digital-art-sentiment/MevonAI-Speech-Emotion-Recognition/src/
 
 /bin/bash
