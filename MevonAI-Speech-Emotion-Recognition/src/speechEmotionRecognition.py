@@ -58,7 +58,7 @@ def predict(folder, classes, model):
 
 if __name__ == '__main__':
     INPUT_FOLDER_PATH = "input/"
-    OUTPUT_FOLDER_PATH = "output/"
+    OUTPUT_FOLDER_PATH = "input/"
     # for subdir in os.listdir(INPUT_FOLDER_PATH):
     # bk.diarizeFromFolder(
     # f'{INPUT_FOLDER_PATH}{subdir}{"/"}', (f'{OUTPUT_FOLDER_PATH}{subdir}{"/"}'))
