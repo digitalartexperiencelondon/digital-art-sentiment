@@ -1,4 +1,4 @@
-#!/bin/sh -l
+#!/bin/sh
 
 git clone https://github.com/digitalartexperiencelondon/digital-art-sentiment.git
 
