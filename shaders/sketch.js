@@ -1,6 +1,6 @@
 // Global variables
 const fps = 60;
-const fetchFrequencySeconds = 1;
+const fetchFrequencySeconds = 2;
 
 let printSentimentResponse = false;
 let sentimentResponse, sentimentResponseValues;
@@ -9,6 +9,7 @@ let sentimentsToShader;
 let loadedShader;
 
 let localTestData;
+let receiveData = true;
 
 // ****************************************************************************
 // DATA FETCHING AND PARSING
@@ -36,7 +37,7 @@ class SentimentResponse {
   //     "surprise": 0.1,
   //     "type": "audio"
   // }
-  constructor(data) {
+  constructor(data = {}) {
     this.anger = data.anger ?? 0.0;
     this.contempt = data.contempt ?? 0.0;
     this.disgust = data.disgust ?? 0.0;
@@ -46,6 +47,50 @@ class SentimentResponse {
     this.sadness = data.sadness ?? 0.0;
     this.surprise = data.surprise ?? 0.0;
     this.type = data.type ?? "unknown";
+  }
+
+  setTestFrustration() {
+    this.anger = 0.3;
+    this.contempt = 0.0;
+    this.disgust = 0.8;
+    this.fear = 0.4;
+    this.happiness = 0.0;
+    this.neutral = 0.0;
+    this.sadness = 0.9;
+    this.surprise = 0.0;
+  }
+
+  setTestExcitement() {
+    this.anger = 0.3;
+    this.contempt = 0.8;
+    this.disgust = 0.1;
+    this.fear = 0.2;
+    this.happiness = 0.9;
+    this.neutral = 0.5;
+    this.sadness = 0.0;
+    this.surprise = 0.9;
+  }
+
+  setTestBored() {
+    this.anger = 0.3;
+    this.contempt = 0.1;
+    this.disgust = 0.7;
+    this.fear = 0.2;
+    this.happiness = 0.1;
+    this.neutral = 0.7;
+    this.sadness = 0.5;
+    this.surprise = 0.0;
+  }
+
+  setTestAngry() {
+    this.anger = 0.9;
+    this.contempt = 0.1;
+    this.disgust = 0.7;
+    this.fear = 0.2;
+    this.happiness = 0.1;
+    this.neutral = 0.0;
+    this.sadness = 0.5;
+    this.surprise = 0.4;
   }
 
   toArray() {
@@ -84,10 +129,9 @@ function fetchSentimentData() {
   // });
 
   // TODO: remove next block (it's just reading test input)
-  // sentimentResponse = new SentimentResponse(localTestData);
-  // const response = sentimentResponse.toSentimentsArray();
-  const response = Array.from(Array(8)).map((x) => random(0.0, 1.0));
-  sentimentResponse = new SentimentResponse({});
+  const maxAmout = receiveData ? 1.0 : 0.0;
+  const response = Array.from(Array(8)).map((_) => random(0.0, maxAmout));
+  sentimentResponse = new SentimentResponse();
   sentimentResponse.fromArray(response);
 
   sentimentsToShader = sentimentResponseValues ?? response;
@@ -99,7 +143,7 @@ function fetchSentimentData() {
 // ****************************************************************************
 function preload() {
   loadedShader = loadShader("assets/vshader.glsl", "assets/fshader.glsl");
-  localTestData = loadJSON("assets/test_data.json");
+  // localTestData = loadJSON("assets/test_data.json");
 }
 
 function setup() {
@@ -131,7 +175,14 @@ function draw() {
   // to the last fetched value.
   sentimentsToShader = sentimentResponseValues.map((amount, idx) => {
     const lastAmount = sentimentsToShader[idx];
-    return map(interpolationFrame, 1, fetchFrequencyFrames, lastAmount, amount);
+    let nextAmount = map(
+      interpolationFrame,
+      1,
+      fetchFrequencyFrames,
+      lastAmount,
+      amount
+    );
+    return nextAmount < 0.01 ? 0.0 : nextAmount;
   });
 
   // Sort the sentiments by amount and get the ordered indices.
@@ -156,6 +207,12 @@ function draw() {
   loadedShader.setUniform("u_top2", top2Idx);
   loadedShader.setUniform("u_mean", mean);
   rect(0, 0, width, height);
+}
+
+function keyPressed() {
+  if (key == "s") {
+    receiveData = !receiveData;
+  }
 }
 
 function windowResized() {

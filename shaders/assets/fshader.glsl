@@ -78,13 +78,18 @@ SceneObject getTop2SentimentsPlasma(vec2 p) {
   }
 
   // Time varying pixel color
-  vec3 colorTop1 = getSentiment(u_audio, u_top1).color;
+  Sentiment topSentiment = getSentiment(u_audio, u_top1);
+  vec3 colorTop1;
   vec3 colorTop2;
-  if (u_top1 != u_top2) {
+  if (topSentiment.amount == 0.0) {
+    colorTop1 = 0.4 * COLOR_NEUTRAL;
+    colorTop2 = 0.7 * COLOR_NEUTRAL;
+  } else if (u_top1 != u_top2) {
+    colorTop1 = topSentiment.color;
     colorTop2 = getSentiment(u_audio, u_top2).color;
   } else {
-    colorTop2 = mix(colorTop1, COLOR_NEUTRAL, 0.1);
-    colorTop1 = mix(colorTop1, vec3(0.0), 0.2);
+    colorTop1 = mix(topSentiment.color, vec3(0.0), 0.2);
+    colorTop2 = mix(topSentiment.color, COLOR_NEUTRAL, 0.1);
   }
   vec3 color = mix(colorTop2, colorTop1, p.y + 0.5);
 
@@ -119,13 +124,20 @@ SceneObject getSentimentBubbles(float sentimentAmountThreshold, vec2 p) {
     Bubble bubble;
     bubble.position = vec2(0.0);
     float theta = TWO_PI * float(idx) / float(NUM_SENTIMENTS);
-    bubble.position.x = 0.5 * cos(theta * sentiment.speed * u_time);
-    bubble.position.y = 0.5 * sin(sentiment.amount * theta + u_time);
+    bubble.position.x =
+        0.5 * cos(theta * sentiment.speed * (sentiment.amount + 0.1) * u_time);
+    bubble.position.y =
+        0.5 * sin(sentiment.speed * (sentiment.amount + 0.1) * u_time + theta);
     bubble.radius = sentiment.amount <= sentimentAmountThreshold
                         ? 0.0 // Discard smaller bubbles.
-                        : 1.5 * sentiment.amount;
+                        : 1.5 * (sentiment.amount + 0.1);
+
     bubble.radius *= bubble.radius; // Empathize the color in the SDF.
     bubble.color = sentiment.color;
+    if (getSentiment(u_audio, u_top1).amount == 0.0) {
+      bubble.radius = 0.15;
+      bubble.color = vec3(sentiment.color.r);
+    }
 
     // Get the SDF (signed distance function) to the bubble and accumulate its
     // color values.
@@ -151,8 +163,15 @@ void main() {
 
   vec3 scene;
   SceneObject background = getTop2SentimentsPlasma(p);
-  SceneObject foreground = getSentimentBubbles(u_mean, p);
   scene = add(scene, background.sdf, background.color);
+
+  SceneObject foreground;
+  if (getSentiment(u_audio, u_top1).amount == 0.0) {
+    foreground = getSentimentBubbles(-1.0, p);
+
+  } else {
+    foreground = getSentimentBubbles(u_mean, p);
+  }
   scene = add(scene, foreground.sdf, foreground.color);
 
   gl_FragColor = vec4(scene, 1.0);
