@@ -40,50 +40,6 @@ class SentimentResponse {
     this.type = data.type ?? "unknown";
   }
 
-  // setTestFrustration() {
-  //   this.anger = 0.3;
-  //   this.contempt = 0.0;
-  //   this.disgust = 0.8;
-  //   this.fear = 0.4;
-  //   this.happiness = 0.0;
-  //   this.neutral = 0.0;
-  //   this.sadness = 0.9;
-  //   this.surprise = 0.0;
-  // }
-
-  // setTestExcitement() {
-  //   this.anger = 0.3;
-  //   this.contempt = 0.8;
-  //   this.disgust = 0.1;
-  //   this.fear = 0.2;
-  //   this.happiness = 0.9;
-  //   this.neutral = 0.5;
-  //   this.sadness = 0.0;
-  //   this.surprise = 0.9;
-  // }
-
-  // setTestBored() {
-  //   this.anger = 0.3;
-  //   this.contempt = 0.1;
-  //   this.disgust = 0.7;
-  //   this.fear = 0.2;
-  //   this.happiness = 0.1;
-  //   this.neutral = 0.7;
-  //   this.sadness = 0.5;
-  //   this.surprise = 0.0;
-  // }
-
-  // setTestAngry() {
-  //   this.anger = 0.9;
-  //   this.contempt = 0.1;
-  //   this.disgust = 0.7;
-  //   this.fear = 0.2;
-  //   this.happiness = 0.1;
-  //   this.neutral = 0.0;
-  //   this.sadness = 0.5;
-  //   this.surprise = 0.4;
-  // }
-
   toArray() {
     return Object.entries(this)
       .filter(([key, _value]) => key !== "type")
