@@ -44,35 +44,30 @@ function draw() {
     printSentimentResponse = false;
   }
 
-  // Interpolate the sentiment values from the last value sent to the shaders,
-  // to the last fetched value.
-  sentimentsToShader = sentimentResponseValues.map((sentimentAmount, idx) => {
-    const previousSentimentAmount = sentimentsToShader[idx];
-    let nextSentimentAmount = map(
+  // Compute the sentiment data that needs to be sent to the shader.
+  // - The sentiment intensity array to be sent to the shaders, contains the
+  // interpolated intensities from the last value sent to the shaders, to the
+  // last fetched value.
+  sentimentsToShader = sentimentResponseValues.map((intensity, idx) => {
+    const previousIntensity = sentimentsToShader[idx];
+    const nextIntensity = map(
       interpolationFrame,
       firstInterpolationFrame,
       lastInterpolationFrame,
-      previousSentimentAmount,
-      sentimentAmount
+      previousIntensity,
+      intensity
     );
-    // Cast the next amount to 0.0 if it is too small.
-    return nextSentimentAmount < 0.01 ? 0.0 : nextSentimentAmount;
+    // Cast the next intensity to 0.0 if it is too small.
+    return nextIntensity < 0.01 ? 0.0 : nextIntensity;
   });
 
-  // Sort the sentiments by amount and get the ordered indices.
-  const orderedSentimentsIndices = sentimentsToShader
-    .map((amount, idx) => [amount, idx])
-    .sort()
-    .reverse();
-
-  // TODO(sonia) here: refactor the shader and see what top data do we need to
-  // pass and what can we remove/clean up
-  const [_top1Amount, top1Idx] = orderedSentimentsIndices[0];
-  let [top2Amount, top2Idx] = orderedSentimentsIndices[1];
-
+  // - Get the top 2 sentiments, where the top 2 is considered a top sentiment
+  // if its value is higher that a threshold (in this case, the mean of the
+  // intensities of all the sentiments).
   const sentimentsMean = mean(sentimentsToShader);
-  top2Idx = top2Amount < sentimentsMean ? top1Idx : top2Idx;
+  const [top1Idx, top2Idx] = getTop2Sentiments(sentimentsMean);
 
+  // Connect to the shaders and send the data as uniforms.
   shader(loadedShader);
   loadedShader.setUniform("u_resolution", [width, height]);
   loadedShader.setUniform("u_time", 0.01 * frameCount);
@@ -108,6 +103,18 @@ function requestSentimentResponse() {
   sentimentResponseValues = sentimentResponseAsArray;
 }
 
-function mean(array) {
-  return array.reduce((amount, acc) => amount + acc) / array.length;
+function getTop2Sentiments(threshold) {
+  // Sort the sentiments by intensity and get the ordered indices, in order to
+  // get the 2 top sentiments. Return the indices of the 1st and 2nd sentiments,
+  // if the 2nd sentiment is enough intense. Otherwise, return the 1st twice.
+  const orderedSentimentsIndices = sentimentsToShader
+    .map((intensity, idx) => [intensity, idx])
+    .sort()
+    .reverse();
+
+  const [_top1Intensity, top1Idx] = orderedSentimentsIndices[0];
+  let [top2Intensity, top2Idx] = orderedSentimentsIndices[1];
+  top2Idx = top2Intensity < threshold ? top1Idx : top2Idx;
+
+  return [top1Idx, top2Idx];
 }
