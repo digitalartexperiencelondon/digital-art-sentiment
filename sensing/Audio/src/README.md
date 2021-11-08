@@ -14,8 +14,8 @@ Make sure you are on the correct git branch by running
 Ensure you are in the correct folder (`/sensing/Audio/src`)
 
 Run the following commands:
-        conda env create -f environment.yml
-        conda activate tf15
+    conda env create -f environment.yml
+    conda activate tf15
 
 This will create the Anaconda environment, and activate it.
 
