@@ -9,11 +9,13 @@ Follow the instructions [here](https://conda.io/projects/conda/en/latest/user-gu
 The Anaconda environment is defined in the `environment.yml` file.
 
 Make sure you are on the correct git branch by running
-        git checkout ml-audio-input
+
+    git checkout ml-audio-input
 
 Ensure you are in the correct folder (`/sensing/Audio/src`)
 
 Run the following commands:
+
     conda env create -f environment.yml
     conda activate tf15
 
@@ -23,6 +25,7 @@ This will create the Anaconda environment, and activate it.
 Ensure that before you run the code, you have followed the instructions in `/storage/notes.txt` to run the Docker container to get the database server running. This can be on the same machine or a different one (including a Raspberry Pi).
 
 Run
+
         python3.7 AutoRecorder.py
 
 When it says `listening`, speak.
@@ -30,7 +33,9 @@ Then you will see the machine learning sentiment analysis output in the console,
 
 ## Deactivation
 To deactivate the Conda environment, run
+
         conda deactivate
 
 In future, to re-activate the environment, you only need to run
+
         conda activate tf15
