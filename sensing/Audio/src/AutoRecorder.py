@@ -72,7 +72,7 @@ class Recorder:
         rec = []
 
         data = self.stream.read(chunk)
-        
+
         return data
 
     def predict(self, recording):
@@ -81,37 +81,37 @@ class Recorder:
         lst = []
         predictions = []
         # print("Sub",subdir)
-            
+
         X =  np.frombuffer(recording, dtype=np.int16).astype(np.float)
         X = X*SHORT_NORMALIZE
         sample_rate = RATE
-        
+
         print(type(X))
         print(min(X), max(X))
         #X = np.double(X)
-        
+
         temp = np.zeros((1, 13, 216))
-        
+
         mfccs = librosa.feature.mfcc(y=X, sr=sample_rate, n_mfcc=13)
         result = np.zeros((13, 216))
         result[:mfccs.shape[0], :mfccs.shape[1]] = mfccs
         temp[0] = result
         t = np.expand_dims(temp, axis=3)
-        
+
         return classes[model.predict_classes(t)[0]], model.predict(t), classes
-       
-       
+
+
     def upload(self, probabilities, class_names):
         headers ={"Content-Type":"application/json"}
         data = {"type":"Audio"}
         for i, prob in enumerate(probabilities):
-            data[class_names[i]] = str(prob);
+            data[class_names[i]] = str(prob)
         print(data)
-        
+
         x = requests.post(url, json = data, headers = headers)
         print(x)
-        
-    
+
+
     def listen(self):
         print('Listening beginning')
         while True:
