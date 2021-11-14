@@ -32,8 +32,11 @@ Build the second Docker container from the Dockerfile in `storage/`, by ensuring
 
     docker build -t art-api .
 
-Then, run the following to run the container. Ensure you replace `<art-mysql-ip> with the IP address you found in step 2.
+Note the full stop at the end of this command.
+
+Then, run the following to run the container. Ensure you replace <art-mysql-ip> with the IP address you found in step 2.
 
     docker run --name art-api -e mysqlip=<art-mysql-ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
 
 This will connect the `art-api` container to the MySQL database in the `art-mysql` container. It also exposes internal port 10000 to external port 10000.
+You should see `Handling Requests` being outputted to the command line, which means that the server is running.
