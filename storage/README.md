@@ -1,42 +1,51 @@
-# Setting up the server for the database
 
-The architecture is arranged so that two Docker containers are created.
-The first Docker container is a MySQL server instance, and creates the MySQL database to store the sentiments along with a time stamp.
-The second Docker container is created from the Dockerfile in `storage/Dockerfile`, which is based on a Go Lang base Docker image. This will handle requests and using the IP address of the MySQL Docker container, submit observations to the database.
+# Sentiment Server
 
-## 1. Pull MySQL Docker image, and run the container
-### On a laptop/desktop
-Run the following commands:
+This creates a server for receiving and serving sentiment events.
 
-    docker pull mysql
-    docker run --name art-mysql -e MYSQL_ROOT_PASSWORD=admin -d mysql:latest
+Sentiment events can include values of ```anger```, ```contempt```, ```disgust```, ```fear```, ```happiness```, ```neutral```, ```sadness```, and ```surprise``` between ```0``` and ```1``` inclusive.
 
-Ensure you are logged into the Docker command line interface, otherwise the first command will fail.
+## Set-up
+On a Non-Raspberry Pi - download the base mysql docker image
+```
+docker pull mysql
+docker run --name art-mysql -e MYSQL_ROOT_PASSWORD=admin -d mysql:latest
+```
+On Raspberry Pi - download the ARM-suitable base mysql docker image
+```
+docker pull hypriot/rpi-mysql
+docker run --name art-mysql -e MYSQL_ROOT_PASSWORD=admin -d hypriot/rpi-mysql:latest
+```
+Find the art-mysql docker ip address (something like 172.17.0.2)
+```
+docker inspect art-mysql
+```
 
-### On Raspberry Pi
-Pulling the MySQL Docker image will not work on a Raspberry Pi, as the image is not built for ARM architectures.
-Instead, run
+Build and run the art-api docker container, connecting to mysql db, and exposing internal port 10000 to external >docker. Note the full stop at the end of this command. 
+```
+docker build -t art-api .
+docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
+```
 
-    docker pull hypriot/rpi-mysql
-    docker run --name art-mysql -e MYSQL_ROOT_PASSWORD=admin -d hypriot/rpi-mysql:latest
+## After a restart
+The containers already exist, they just need starting 
+```
+docker start art-mysql
+docker start art-api
+```
 
-## 2. Get the MySQL Docker container's IP address
-Run
+## Sentiment API
+The server exposes multiple endpoints for different purposes
 
-    docker inspect art-mysql
+### GET endpoints
+```/observations``` GET all sentiment events in the database
 
-This will print details about the container to the command line, and the IP address will be in the `"Networks"/"IPAddress" section.
+```/aggregated?t=<time>``` GET sentiment events grouped by type from the last ```<time>``` milliseconds
 
-## 3. Build and run the GoLang based Docker container
-Build the second Docker container from the Dockerfile in `storage/`, by ensuring you are currently located in the `storage` directory, and then running
+### POST endpoint
+```/submit``` POST sentiment events to the database
 
-    docker build -t art-api .
-
-Note the full stop at the end of this command.
-
-Then, run the following to run the container. Ensure you replace <art-mysql-ip> with the IP address you found in step 2.
-
-    docker run --name art-api -e mysqlip=<art-mysql-ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
-
-This will connect the `art-api` container to the MySQL database in the `art-mysql` container. It also exposes internal port 10000 to external port 10000.
-You should see `Handling Requests` being outputted to the command line, which means that the server is running.
+For example, an event can be POSTed to the server as follows. 
+```
+curl -X POST -H Content-Type:application/json -d '{"Type":"Audio", "anger":0.001, "surprise":0.8}' <server ip>:10000/submit
+```
