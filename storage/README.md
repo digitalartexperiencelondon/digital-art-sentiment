@@ -1,3 +1,4 @@
+
 # Sentiment Server
 
 This creates a server for receiving and serving sentiment events.
@@ -20,7 +21,7 @@ Find the art-mysql docker ip address (something like 172.17.0.2)
 docker inspect art-mysql
 ```
 
-Build and run the art-api docker container, connecting to mysql db, and exposing internal port 10000 to external >docker 
+Build and run the art-api docker container, connecting to mysql db, and exposing internal port 10000 to external >docker. Note the full stop at the end of this command. 
 ```
 docker build -t art-api .
 docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api

@@ -1,0 +1,12 @@
+name: tf15
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - tensorflow=1.15
+  - python=3.7
+  - pyaudio
+  - keras
+  - librosa
+  - h5py=2.10.0
+prefix: /opt/anaconda3/envs/tf15
