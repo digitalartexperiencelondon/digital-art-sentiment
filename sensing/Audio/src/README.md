@@ -8,10 +8,6 @@ Follow the instructions [here](https://conda.io/projects/conda/en/latest/user-gu
 ## Creating the Anaconda environment
 The Anaconda environment is defined in the `environment.yml` file.
 
-Make sure you are on the correct git branch by running
-
-    git checkout ml-audio-input
-
 Ensure you are in the correct folder (`/sensing/Audio/src`)
 
 Run the following commands:
@@ -22,7 +18,7 @@ Run the following commands:
 This will create the Anaconda environment, and activate it.
 
 ## Running the code
-Ensure that before you run the code, you have followed the instructions in `/storage/notes.txt` to run the Docker container to get the database server running. This can be on the same machine or a different one (including a Raspberry Pi).
+Ensure that before you run the code, you have followed the instructions in `/storage/README.md` to run the Docker container to get the database server running. This can be on the same machine or a different one (including a Raspberry Pi).
 
 Run
 

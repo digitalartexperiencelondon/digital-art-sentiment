@@ -43,10 +43,15 @@ docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=ro
 You should see `Handling Requests` being outputted to the command line, which means that the server is running.
 
 ## After a restart
-The containers already exist, they just need starting 
+The containers already exist, they just need starting
 ```
 docker start art-mysql
-docker start art-api
+```
+
+To restart the `art-api` container, so that the IP address and port mapping can still be passed to it, you need to stop the container and the rerun it with the same IP address you found in step 2:
+```
+docker stop art-api
+docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
 ```
 
 ## Sentiment API
@@ -60,7 +65,7 @@ The server exposes multiple endpoints for different purposes:
 - ### POST endpoint
 ```/submit``` POST sentiment events to the database
 
-For example, an event can be POSTed to the server as follows. 
+For example, an event can be POSTed to the server as follows.
 ```
 curl -X POST -H Content-Type:application/json -d '{"Type":"Audio", "anger":0.001, "surprise":0.8}' <server ip>:10000/submit
 ```
