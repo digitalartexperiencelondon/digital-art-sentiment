@@ -46,12 +46,7 @@ You should see `Handling Requests` being outputted to the command line, which me
 The containers already exist, they just need starting
 ```
 docker start art-mysql
-```
-
-To restart the `art-api` container, so that the IP address and port mapping can still be passed to it, you need to stop the container and the rerun it with the same IP address you found in step 2:
-```
-docker stop art-api
-docker run --name art-api -e mysqlip=<art-mysql container ip>:3306 -e mysqlun=root:admin -p 10000:10000 art-api
+docker start art-api
 ```
 
 ## Sentiment API
